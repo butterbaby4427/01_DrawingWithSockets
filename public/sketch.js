@@ -5,7 +5,7 @@ var socket;
 
 // var buttonSmall, buttonLarge, buttonNormal;
 var emoji;
-var hue;
+var hue = 100;
 var slider;
 var wavySize;
 var counter = 0;
@@ -15,12 +15,12 @@ function preload(){
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight-50);
 
   // this connects the front end code to the socket communications
   socket = io.connect('http://localhost:3000');
   
-  background('red');
+  background(220);
 
   // handle the broadcast calls coming from the server
   socket.on('yourHue',changeHue);
@@ -43,11 +43,16 @@ function setup() {
 }
 
 function newCircleDrawing(data){
+    if (data.counter % 2 == 0){
+      fill(data.hue, 100, 100);
+    }else{
+      fill((data.hue-20)%100,100,100);
+    }
   ellipse(data.x, data.y, data.size, data.size);
 }
 
 function newEmojiDrawing(data){
-    image(emoji1, data.x, data.y, 80, 80);
+    image(emoji, data.x, data.y, 80, 80);
 }
 
 function draw() {
@@ -55,8 +60,13 @@ function draw() {
 
 // will activate whenever you click and drag
 function mouseDragged(){
-  wavySize = (map(slider.value(0,360,5,75))*sin(counter*2));
-  fill(100, 100, 100);
+  wavySize = (map(slider.value(),0,360,25,75))*sin(counter*10)+10;
+  if (counter % 2 == 0){
+    fill(hue, 100, 100);
+  }else{
+    fill((hue-20)%100,100,100);
+  }
+
   ellipse(mouseX, mouseY, wavySize, wavySize);
 
   // data is what sockets will send to other clients
@@ -64,7 +74,9 @@ function mouseDragged(){
   var data = {
     x: mouseX,
     y: mouseY,
-    size: wavySize;
+    size: wavySize,
+    hue: hue,
+    counter: counter
   };
 
   socket.emit('circle', data);
@@ -82,6 +94,6 @@ function mouseClicked(){
   socket.emit('emoji', data);
 }
 
-function changeHue(hue){
-  fill(hue,100,100);
+function changeHue(data){
+  hue = data;
 }
