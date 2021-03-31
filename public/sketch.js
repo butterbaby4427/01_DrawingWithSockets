@@ -18,7 +18,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight-50);
 
   // this connects the front end code to the socket communications
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('http://157.230.83.178:3000');
   
   background(220);
 
